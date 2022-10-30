@@ -1,11 +1,10 @@
 // app/profile/[id]/page.js
 'use client'
-
 import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import { ethers } from 'ethers'
 import Image from 'next/image'
-import { client, getPublications, getProfile } from '../../../api'
+import { client, getPublications, getProfile,getProfileByHandle } from '../../../api'
 import ABI from '../../../abi.json'
 
 const CONTRACT_ADDRESS = '0xDb46d1Dc155634FbC732f92E853b10B288AD5a1d'
@@ -37,9 +36,13 @@ export default function Profile() {
   }
 
   async function fetchProfile() {
-    console.log({ id })
+    let returnedProfile
     try {
-      const returnedProfile = await client.query(getProfile, { id }).toPromise();
+      if(id.indexOf("0x0") > -1){
+        returnedProfile = await client.query(getProfile, { id }).toPromise();
+      }else{
+        returnedProfile = await client.query(getProfileByHandle, { handle:id }).toPromise();
+      }
 
       const profileData = returnedProfile.data.profile
       const picture = profileData.picture
@@ -50,8 +53,7 @@ export default function Profile() {
         }
       }
       setProfile(profileData)
-
-      const pubs = await client.query(getPublications, { id, limit: 50 }).toPromise()
+      const pubs = await client.query(getPublications, { id:returnedProfile.data.profile.id, limit: 50 }).toPromise()
       setPublications(pubs.data.publications.items)
     } catch (err) {
       console.log('error fetching profile...', err)
@@ -90,22 +92,23 @@ export default function Profile() {
   }
 
   if (!profile) return null
-
+  
   return (
     <div>
       <div style={profileContainerStyle}>
         {
           !connected && (
             <button style={buttonStyle} onClick={connectWallet}>Connect Wallet</button>
-          )
-        }
+            )
+          }
         <Image
           width="200"
           height="200"
           alt={profile.handle}
           src={profile.picture?.original?.url}
-        />
+          />
         <h1>{profile.handle}</h1>
+          </div>
         {
             publications.map((pub, index) => (
               <div key={index} style={publicationContainerStyle}>
@@ -121,7 +124,6 @@ export default function Profile() {
             >Follow {profile.handle}</button>
           )
         }
-      </div>
     </div>
   )
 }

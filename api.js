@@ -73,3 +73,21 @@ export const getProfile = `
     }
   }
 `
+
+export const getProfileByHandle = `
+  query Profile($handle: Handle!) {
+    profile(request: { handle: $handle }) {
+      id
+      name
+      bio
+      picture {
+        ... on MediaSet {
+          original {
+            url
+          }
+        }
+      }
+      handle
+    }
+  }
+`
