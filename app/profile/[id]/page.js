@@ -144,6 +144,6 @@ const publicationContainerStyle = {
 const profileContainerStyle = {
   display: 'flex',
   flexDirection: 'column',
-  alignItems: 'flex-start',
+  alignItems: 'center',
   padding: '20px  60px'
 }
