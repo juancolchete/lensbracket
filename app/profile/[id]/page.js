@@ -106,6 +106,7 @@ export default function Profile() {
           height="200"
           alt={profile.handle}
           src={profile.picture?.original?.url}
+          style={profileImg}
           />
         <h1>{profile.handle}</h1>
           </div>
@@ -146,4 +147,7 @@ const profileContainerStyle = {
   flexDirection: 'column',
   alignItems: 'center',
   padding: '20px  60px'
+}
+const profileImg = {
+  borderRadius: '50%',
 }
