@@ -39,6 +39,15 @@ export default function Profile() {
       setConnected(false);
     }
   }
+  function genPinnedLink(picture){
+    if(picture){
+      let result = picture.substring(
+        7,
+        picture.length
+      );
+      return `http://lens.infura-ipfs.io/ipfs/${result}`
+    }
+  }
 
   async function fetchProfile() {
     let returnedProfile;
@@ -55,20 +64,26 @@ export default function Profile() {
       const picture = profileData.picture;
       if (picture && picture.original && picture.original.url) {
         if (picture.original.url.startsWith("ipfs://")) {
-          let result = picture.original.url.substring(
-            7,
-            picture.original.url.length
-          );
-          profileData.picture.original.url = `http://lens.infura-ipfs.io/ipfs/${result}`;
+          profileData.picture.original.url = genPinnedLink(picture.original.url);
         }
       }
       setProfile(profileData);
       const pubs = await client
         .query(getPublications, {
-          id: returnedProfile.data.profile.id,
-          limit: 50,
+          "request": {
+            "publicationTypes": [
+              "POST",
+              "MIRROR"
+            ],
+            "metadata": null,
+            "profileId": "0x01c51b",
+            "limit": 10
+          },
+          "reactionRequest": null,
+          "profileId": null
         })
         .toPromise();
+        console.log(pubs.data.publications)
       setPublications(pubs.data.publications.items);
     } catch (err) {
       console.log("error fetching profile...", err);
@@ -121,9 +136,13 @@ export default function Profile() {
         />
         <h1>{profile.handle}</h1>
         <div style={postContainer}>
+          {console.log(publications)}
           {publications.map((pub, index) => (
             <div key={index} style={publicationContainerStyle}>
               <p>{pub.metadata.content}</p>
+              {console.log(pub.metadata.image)}
+              <Image src={genPinnedLink(pub.metadata.image)} loading="lazy" width="1000"
+          height="1000"/>
             </div>
           ))}
           {connected && (
