@@ -76,14 +76,13 @@ export default function Profile() {
               "MIRROR"
             ],
             "metadata": null,
-            "profileId": "0x01c51b",
+            "profileId":  returnedProfile.data.profile.id,
             "limit": 10
           },
           "reactionRequest": null,
           "profileId": null
         })
         .toPromise();
-        console.log(pubs.data.publications)
       setPublications(pubs.data.publications.items);
     } catch (err) {
       console.log("error fetching profile...", err);
@@ -140,9 +139,9 @@ export default function Profile() {
           {publications.map((pub, index) => (
             <div key={index} style={publicationContainerStyle}>
               <p>{pub.metadata.content}</p>
-              {console.log(pub.metadata.image)}
-              <Image src={genPinnedLink(pub.metadata.image)} loading="lazy" width="1000"
-          height="1000"/>
+              {pub.metadata.image ?
+              <Image src={genPinnedLink(pub.metadata.image)} loading="lazy" width="1000" height="1000"/>:<></>
+              }
             </div>
           ))}
           {connected && (
